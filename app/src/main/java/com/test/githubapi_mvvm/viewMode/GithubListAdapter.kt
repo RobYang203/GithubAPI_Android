@@ -23,7 +23,7 @@ class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerVi
 
     override fun onBindViewHolder(holder: GithubUserListItem, position: Int) {
         val itemData = data[position]
-
+        holder.bind(itemData)
         holder.itemView.setOnClickListener(object :View.OnClickListener{
             override fun onClick(v: View?) {
                 if(itemEvent == null)
