@@ -17,15 +17,16 @@ interface IGithubRepository{
 class GithubRepository(service:GithubService):IGithubRepository {
     var service = service
     override fun getAllUserList(since: Int, per_page: Int , onResultCallBack:IGithubRepository.ResponseCallBack) {
-        service.getAllUserList(since , per_page).enqueue(object :Callback<GithubUserMode>{
+        service.getAllUserList(since , per_page).enqueue(object :Callback<List<GithubUserMode>>{
             override fun onResponse(
-                call: Call<GithubUserMode>?,
-                response: Response<GithubUserMode>?
+                call: Call<List<GithubUserMode>>?,
+                response: Response<List<GithubUserMode>>?
             ) {
-                onResultCallBack.onResult()
+
+                onResultCallBack.onResult(response!!.body())
             }
 
-            override fun onFailure(call: Call<GithubUserMode>?, t: Throwable?) {
+            override fun onFailure(call: Call<List<GithubUserMode>>?, t: Throwable?) {
                 Log.e("GitHubAPI Error" , t.toString())
             }
         })
