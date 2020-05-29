@@ -1,5 +1,6 @@
 package com.test.githubapi_mvvm.api.services
 
+import com.test.githubapi_mvvm.mode.GithubUserInfoMode
 import com.test.githubapi_mvvm.mode.GithubUserMode
 import retrofit2.Call
 import retrofit2.http.GET
@@ -12,5 +13,5 @@ interface GithubService {
     fun getAllUserList(@Query("since") since:Int,@Query("per_page") per_page:Int):Call<List<GithubUserMode>>
 
     @GET("user/{login}")
-    fun getUserInfo(@Path("login") login:String):Call<>
+    fun getUserInfo(@Path("login") login:String):Call<GithubUserInfoMode>
 }
