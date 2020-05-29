@@ -1,9 +1,11 @@
 package com.test.githubapi_mvvm.viewMode
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.test.githubapi_mvvm.databinding.VhUseritemBinding
 import com.test.githubapi_mvvm.mode.GithubUserMode
 
 class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerView.Adapter<GithubUserListItem>() {
@@ -11,9 +13,10 @@ class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerVi
     val data = data
     var itemEvent:itemEvent? = null
 
-    fun setItemClick(clickEvent:itemEvent){
+    fun setOnItemClick(clickEvent:itemEvent){
         itemEvent = clickEvent
     }
+
     override fun getItemCount(): Int {
         return  data.size
     }
@@ -31,6 +34,8 @@ class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerVi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GithubUserListItem {
-        return GithubUserListItem()
+        val lInflater = LayoutInflater.from(context)
+        val v = VhUseritemBinding.inflate(lInflater ,parent , false)
+        return GithubUserListItem(v)
     }
 }
