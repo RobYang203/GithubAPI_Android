@@ -8,7 +8,7 @@ import java.lang.IllegalArgumentException
 
 class GithubUserInfoFactory(private val repo:GithubRepository):ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if(modelClass.isAssignableFrom(GithubUserInfoMode::class.java)){
+            if(modelClass.isAssignableFrom(GithubUserInfoViewMode::class.java)){
                 return  GithubUserInfoViewMode(repo) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

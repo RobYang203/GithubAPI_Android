@@ -12,6 +12,6 @@ interface GithubService {
     @GET("users")
     fun getAllUserList(@Query("since") since:Int,@Query("per_page") per_page:Int):Call<List<GithubUserMode>>
 
-    @GET("user/{login}")
+    @GET("users/{login}")
     fun getUserInfo(@Path("login") login:String):Call<GithubUserInfoMode>
 }

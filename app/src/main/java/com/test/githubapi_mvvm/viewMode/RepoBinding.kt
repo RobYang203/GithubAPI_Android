@@ -19,7 +19,11 @@ fun showText(view:TextView,isShow:Boolean){
 }
 
 @BindingAdapter("imageUrl")
-fun bindImage(view:ImageView,url:String){
+fun bindImage(view:ImageView,url:String?){
+    if(url == null){
+        return
+    }
+
     val context = view.context
     Glide.with(context)
         .load(url)

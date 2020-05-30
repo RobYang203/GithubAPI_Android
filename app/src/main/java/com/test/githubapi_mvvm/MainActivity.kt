@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
                 val viewAdapter = GithubListAdapter(baseContext , result)
                 viewAdapter.setOnItemClick(object :itemEvent{
                     override fun onItemClick(data: GithubUserMode) {
-                        Toast.makeText(baseContext , "d" , Toast.LENGTH_LONG).show()
                         val login = data.login
                         val i = Intent(baseContext , UserDetailActivity::class.java)
                         i.putExtra("login" , login)

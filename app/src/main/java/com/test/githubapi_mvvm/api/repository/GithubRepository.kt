@@ -7,6 +7,7 @@ import com.test.githubapi_mvvm.mode.GithubUserMode
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 
 interface IGithubRepository{
     fun getAllUserList(since:Int ,per_page:Int , onResultCallBack:IGithubRepository.ResponseCallBack)
@@ -38,17 +39,23 @@ class GithubRepository(service:GithubService):IGithubRepository {
     }
 
     override fun getUserInfo(login: String, onUserInfoResult: IGithubRepository.ResponseUserInfoCallBack) {
-        service.getUserInfo(login).enqueue(object :Callback<GithubUserInfoMode>{
-            override fun onResponse(
-                call: Call<GithubUserInfoMode>?,
-                response: Response<GithubUserInfoMode>?
-            ) {
-                onUserInfoResult.onResult(response!!.body())
-            }
+        try{
+            service.getUserInfo(login).enqueue(object :Callback<GithubUserInfoMode>{
+                override fun onResponse(
+                    call: Call<GithubUserInfoMode>?,
+                    response: Response<GithubUserInfoMode>?
+                ) {
+                    onUserInfoResult.onResult(response!!.body())
+                }
 
-            override fun onFailure(call: Call<GithubUserInfoMode>?, t: Throwable?) {
-                Log.e("API getUserInfo Error" , t.toString())
-            }
-        })
+                override fun onFailure(call: Call<GithubUserInfoMode>?, t: Throwable?) {
+                    Log.e("API getUserInfo Error" , t.toString())
+                }
+            })
+
+        }catch (e:Exception){
+            Log.e("API getUserInfo Error" , e.toString())
+        }
+
     }
 }
