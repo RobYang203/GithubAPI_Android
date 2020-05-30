@@ -1,5 +1,6 @@
 package com.test.githubapi_mvvm
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.test.githubapi_mvvm.api.APIManager
 import com.test.githubapi_mvvm.api.repository.GithubRepository
 import com.test.githubapi_mvvm.api.repository.IGithubRepository
+import com.test.githubapi_mvvm.mode.GithubUserInfoMode
 import com.test.githubapi_mvvm.mode.GithubUserMode
 import com.test.githubapi_mvvm.viewMode.GithubListAdapter
 import com.test.githubapi_mvvm.viewMode.itemEvent
@@ -35,10 +37,15 @@ class MainActivity : AppCompatActivity() {
                 viewAdapter.setOnItemClick(object :itemEvent{
                     override fun onItemClick(data: GithubUserMode) {
                         Toast.makeText(baseContext , "d" , Toast.LENGTH_LONG).show()
+                        val login = data.login
+                        val i = Intent(baseContext , UserDetailActivity::class.java)
+                        i.putExtra("login" , login)
+                        startActivityForResult(i ,1)
                     }
                 })
                 vw_UserList.adapter = viewAdapter
             }
+
         })
     }
 }

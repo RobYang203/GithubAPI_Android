@@ -10,10 +10,12 @@ import retrofit2.Response
 
 interface IGithubRepository{
     fun getAllUserList(since:Int ,per_page:Int , onResultCallBack:IGithubRepository.ResponseCallBack)
-    fun getUserInfo(login:String , onUserInfoResult:IGithubRepository.ResponseCallBack)
+    fun getUserInfo(login:String , onUserInfoResult:IGithubRepository.ResponseUserInfoCallBack)
     interface ResponseCallBack{
         fun onResult(result:List<GithubUserMode>)
-        fun onUserInfoResult(result:GithubUserInfoMode)
+    }
+    interface ResponseUserInfoCallBack{
+        fun onResult(result:GithubUserInfoMode)
     }
 }
 
@@ -35,13 +37,13 @@ class GithubRepository(service:GithubService):IGithubRepository {
         })
     }
 
-    override fun getUserInfo(login: String, onUserInfoResult: IGithubRepository.ResponseCallBack) {
+    override fun getUserInfo(login: String, onUserInfoResult: IGithubRepository.ResponseUserInfoCallBack) {
         service.getUserInfo(login).enqueue(object :Callback<GithubUserInfoMode>{
             override fun onResponse(
                 call: Call<GithubUserInfoMode>?,
                 response: Response<GithubUserInfoMode>?
             ) {
-                onUserInfoResult.onUserInfoResult(response!!.body())
+                onUserInfoResult.onResult(response!!.body())
             }
 
             override fun onFailure(call: Call<GithubUserInfoMode>?, t: Throwable?) {
