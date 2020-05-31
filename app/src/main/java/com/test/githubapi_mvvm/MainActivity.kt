@@ -3,9 +3,11 @@ package com.test.githubapi_mvvm
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.test.githubapi_mvvm.api.APIManager
 import com.test.githubapi_mvvm.api.repository.GithubRepository
 import com.test.githubapi_mvvm.api.repository.IGithubRepository
@@ -14,6 +16,7 @@ import com.test.githubapi_mvvm.mode.GithubUserMode
 import com.test.githubapi_mvvm.viewMode.GithubListAdapter
 import com.test.githubapi_mvvm.viewMode.itemEvent
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,6 +24,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        setInitData()
+        setListener()
+    }
+
+    private fun setInitData(){
         val apiMg = APIManager.getAPIManagerInstance()
         val service = apiMg.getService()
 
@@ -45,6 +54,29 @@ class MainActivity : AppCompatActivity() {
                 vw_UserList.adapter = viewAdapter
             }
 
+        })
+    }
+
+    private fun setListener(){
+        vw_UserList.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val manager = recyclerView.layoutManager
+                val adapter = recyclerView.adapter
+                (adapter as GithubListAdapter).setNoDataLoading(false)
+                if(manager == null){
+                    throw RuntimeException("layoutManager error")
+                }
+                if(manager !is LinearLayoutManager){
+                    return
+                }
+                val lastVisibleItemPos = manager.findLastCompletelyVisibleItemPosition()
+                if(lastVisibleItemPos >= adapter.itemCount - 1){
+                    Toast.makeText(baseContext , lastVisibleItemPos.toString() , Toast.LENGTH_LONG).show()
+                }
+                Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
+
+            }
         })
     }
 }
