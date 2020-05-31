@@ -19,6 +19,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity() {
+    lateinit var repo:GithubRepository
+    val TOTAL_PAGES =5;
+    val PREPAGE = 20;
+    var nowPage = 1;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +36,9 @@ class MainActivity : AppCompatActivity() {
     private fun setInitData(){
         val apiMg = APIManager.getAPIManagerInstance()
         val service = apiMg.getService()
-
-        val repo = GithubRepository(service)
-        repo.getAllUserList(0 , 20 ,object :IGithubRepository.ResponseCallBack{
+        val since = nowPage * PREPAGE - PREPAGE
+        repo = GithubRepository(service)
+        repo.getAllUserList(since , PREPAGE ,object :IGithubRepository.ResponseCallBack{
             override fun onResult(result: List<GithubUserMode>) {
                 val lm = LinearLayoutManager(baseContext)
                 lm.orientation = LinearLayoutManager.VERTICAL
@@ -42,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                 vw_UserList.layoutManager = lm
                 vw_UserList.addItemDecoration(DividerItemDecoration(baseContext , DividerItemDecoration.VERTICAL))
 
-                val viewAdapter = GithubListAdapter(baseContext , result)
+                val viewAdapter = GithubListAdapter(baseContext , result as MutableList<GithubUserMode>)
                 viewAdapter.setOnItemClick(object :itemEvent{
                     override fun onItemClick(data: GithubUserMode) {
                         val login = data.login
@@ -62,8 +66,8 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val manager = recyclerView.layoutManager
-                val adapter = recyclerView.adapter
-                (adapter as GithubListAdapter).setNoDataLoading(false)
+                val adapter = recyclerView.adapter as GithubListAdapter
+
                 if(manager == null){
                     throw RuntimeException("layoutManager error")
                 }
@@ -71,10 +75,28 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val lastVisibleItemPos = manager.findLastCompletelyVisibleItemPosition()
+               // Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
+                if(nowPage + 1 > TOTAL_PAGES){
+                    adapter.isLoading = false
+
+                    return
+                }
+
                 if(lastVisibleItemPos >= adapter.itemCount - 1){
+                    adapter.isLoading = true
+                    nowPage++
+                    val since =  nowPage * PREPAGE - PREPAGE
+
+                    repo.getAllUserList(since , PREPAGE ,object:IGithubRepository.ResponseCallBack{
+                        override fun onResult(result: List<GithubUserMode>) {
+                            adapter.addDataList(result)
+                        }
+                    })
+
                     Toast.makeText(baseContext , lastVisibleItemPos.toString() , Toast.LENGTH_LONG).show()
                 }
-                Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
+
+
 
             }
         })

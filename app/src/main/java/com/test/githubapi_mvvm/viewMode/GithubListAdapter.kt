@@ -9,9 +9,10 @@ import com.test.githubapi_mvvm.R
 import com.test.githubapi_mvvm.databinding.VhUseritemBinding
 import com.test.githubapi_mvvm.mode.GithubUserMode
 
-class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GithubListAdapter(context: Context , data:MutableList<GithubUserMode>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val VIEW_BOTTOM = 1
     val VIEW_DATA=0
+
     val context = context
     val data = data
     var itemEvent:itemEvent? = null
@@ -30,8 +31,10 @@ class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerVi
                 val h =(holder as GithubListBottom)
                 if(isLoading){
                     h.txtNoData.visibility = View.GONE
+                    h.progress.visibility = View.VISIBLE
                 }else{
                     h.progress.visibility = View.GONE
+                    h.txtNoData.visibility = View.VISIBLE
                 }
             }
             VIEW_DATA->{
@@ -79,5 +82,11 @@ class GithubListAdapter(context: Context , data:List<GithubUserMode>):RecyclerVi
 
     fun setNoDataLoading(isLoading:Boolean){
         this.isLoading = isLoading
+    }
+
+    fun addDataList(moreList:List<GithubUserMode>){
+        data.addAll(moreList)
+
+        notifyDataSetChanged()
     }
 }
