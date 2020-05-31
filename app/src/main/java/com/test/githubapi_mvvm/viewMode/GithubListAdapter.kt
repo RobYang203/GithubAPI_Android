@@ -84,8 +84,10 @@ class GithubListAdapter(context: Context , data:MutableList<GithubUserMode>):Rec
         this.isLoading = isLoading
     }
 
-    fun addDataList(moreList:List<GithubUserMode>){
-        data.addAll(moreList)
+    fun addDataList(moreList:List<GithubUserMode>?){
+        if(moreList == null)
+            return
+        data.addAll(moreList!!)
 
         notifyDataSetChanged()
     }

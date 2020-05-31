@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         setInitData()
         setListener()
     }
@@ -39,7 +39,11 @@ class MainActivity : AppCompatActivity() {
         val since = nowPage * PREPAGE - PREPAGE
         repo = GithubRepository(service)
         repo.getAllUserList(since , PREPAGE ,object :IGithubRepository.ResponseCallBack{
-            override fun onResult(result: List<GithubUserMode>) {
+            override fun onResult(result: List<GithubUserMode>?) {
+                if(!checkView(result == null))
+                    return
+
+
                 val lm = LinearLayoutManager(baseContext)
                 lm.orientation = LinearLayoutManager.VERTICAL
 
@@ -75,10 +79,9 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val lastVisibleItemPos = manager.findLastCompletelyVisibleItemPosition()
-               // Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
+                Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
                 if(nowPage + 1 > TOTAL_PAGES){
                     adapter.isLoading = false
-
                     return
                 }
 
@@ -88,17 +91,28 @@ class MainActivity : AppCompatActivity() {
                     val since =  nowPage * PREPAGE - PREPAGE
 
                     repo.getAllUserList(since , PREPAGE ,object:IGithubRepository.ResponseCallBack{
-                        override fun onResult(result: List<GithubUserMode>) {
+                        override fun onResult(result: List<GithubUserMode>?) {
+                            if(!checkView(result == null))
+                                return
                             adapter.addDataList(result)
                         }
                     })
 
-                    Toast.makeText(baseContext , lastVisibleItemPos.toString() , Toast.LENGTH_LONG).show()
                 }
 
 
 
             }
         })
+    }
+
+    fun checkView(isNoData:Boolean):Boolean{
+        if(isNoData){
+            txtNotFound.visibility = View.VISIBLE
+            vw_UserList.visibility = View.GONE
+            return false
+        }
+
+        return true
     }
 }

@@ -13,7 +13,7 @@ interface IGithubRepository{
     fun getAllUserList(since:Int ,per_page:Int , onResultCallBack:IGithubRepository.ResponseCallBack)
     fun getUserInfo(login:String , onUserInfoResult:IGithubRepository.ResponseUserInfoCallBack)
     interface ResponseCallBack{
-        fun onResult(result:List<GithubUserMode>)
+        fun onResult(result:List<GithubUserMode>?)
     }
     interface ResponseUserInfoCallBack{
         fun onResult(result:GithubUserInfoMode)
@@ -28,8 +28,12 @@ class GithubRepository(service:GithubService):IGithubRepository {
                 call: Call<List<GithubUserMode>>?,
                 response: Response<List<GithubUserMode>>?
             ) {
-
-                onResultCallBack.onResult(response!!.body())
+                val result = if(response?.body() == null){
+                    null
+                }else{
+                    response!!.body()
+                }
+                onResultCallBack.onResult(result)
             }
 
             override fun onFailure(call: Call<List<GithubUserMode>>?, t: Throwable?) {

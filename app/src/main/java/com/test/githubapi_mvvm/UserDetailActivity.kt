@@ -38,7 +38,7 @@ class UserDetailActivity : AppCompatActivity() {
         //toolbar
         setSupportActionBar(toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow_left_black_24dp)
-        supportActionBar!!.title = "User Information"
+        supportActionBar!!.title = "${login} Information"
         toolbar.setTitleTextColor(Color.WHITE)
         toolbar.setNavigationOnClickListener(object :View.OnClickListener{
             override fun onClick(v: View?) {
