@@ -10,7 +10,7 @@
         tools:context=".MainActivity">
 
         <TextView
-            android:id="@+id/txtNotFound"
+            android:id="@+id/txt_not_found"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Data not found"
@@ -18,7 +18,7 @@
             android:visibility="gone"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/vw_UserList"
+            android:id="@+id/vw_user_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"

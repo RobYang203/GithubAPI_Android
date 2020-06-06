@@ -3,13 +3,13 @@ package com.test.githubapi_mvvm.viewMode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.test.githubapi_mvvm.api.repository.GithubRepository
-import com.test.githubapi_mvvm.mode.GithubUserInfoMode
-import java.lang.IllegalArgumentException
+import com.test.githubapi_mvvm.api.services.GithubService
 
-class GithubUserInfoFactory(private val repo:GithubRepository):ViewModelProvider.Factory {
+class GithubUserInfoFactory(private val service:GithubService):ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if(modelClass.isAssignableFrom(GithubUserInfoViewMode::class.java)){
-                return  GithubUserInfoViewMode(repo) as T
+
+                return  GithubUserInfoViewMode(GithubRepository(service)) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
     }

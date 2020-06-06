@@ -1,65 +1,24 @@
 package com.test.githubapi_mvvm.api.repository
 
-import android.util.Log
 import com.test.githubapi_mvvm.api.services.GithubService
 import com.test.githubapi_mvvm.mode.GithubUserInfoMode
 import com.test.githubapi_mvvm.mode.GithubUserMode
-import retrofit2.Call
-import retrofit2.Callback
+import io.reactivex.Single
 import retrofit2.Response
-import java.lang.Exception
 
 interface IGithubRepository{
-    fun getAllUserList(since:Int ,per_page:Int , onResultCallBack:IGithubRepository.ResponseCallBack)
-    fun getUserInfo(login:String , onUserInfoResult:IGithubRepository.ResponseUserInfoCallBack)
-    interface ResponseCallBack{
-        fun onResult(result:List<GithubUserMode>?)
-    }
-    interface ResponseUserInfoCallBack{
-        fun onResult(result:GithubUserInfoMode)
-    }
+    fun getAllUserList(since:Int ,per_page:Int):Single<Response<List<GithubUserMode>>>
+    fun getUserInfo(login:String):Single<Response<GithubUserInfoMode>>
 }
 
 class GithubRepository(service:GithubService):IGithubRepository {
     var service = service
-    override fun getAllUserList(since: Int, per_page: Int , onResultCallBack:IGithubRepository.ResponseCallBack) {
-        service.getAllUserList(since , per_page).enqueue(object :Callback<List<GithubUserMode>>{
-            override fun onResponse(
-                call: Call<List<GithubUserMode>>?,
-                response: Response<List<GithubUserMode>>?
-            ) {
-                val result = if(response?.body() == null){
-                    null
-                }else{
-                    response!!.body()
-                }
-                onResultCallBack.onResult(result)
-            }
-
-            override fun onFailure(call: Call<List<GithubUserMode>>?, t: Throwable?) {
-                Log.e("GitHubAPI Error" , t.toString())
-            }
-        })
+    override fun getAllUserList(since: Int, per_page: Int):Single<Response<List<GithubUserMode>>> {
+        return service.getAllUserList(since , per_page)
     }
 
-    override fun getUserInfo(login: String, onUserInfoResult: IGithubRepository.ResponseUserInfoCallBack) {
-        try{
-            service.getUserInfo(login).enqueue(object :Callback<GithubUserInfoMode>{
-                override fun onResponse(
-                    call: Call<GithubUserInfoMode>?,
-                    response: Response<GithubUserInfoMode>?
-                ) {
-                    onUserInfoResult.onResult(response!!.body())
-                }
-
-                override fun onFailure(call: Call<GithubUserInfoMode>?, t: Throwable?) {
-                    Log.e("API getUserInfo Error" , t.toString())
-                }
-            })
-
-        }catch (e:Exception){
-            Log.e("API getUserInfo Error" , e.toString())
-        }
+    override fun getUserInfo(login: String):Single<Response<GithubUserInfoMode>> {
+        return service.getUserInfo(login)
 
     }
 }

@@ -1,39 +1,35 @@
 package com.test.githubapi_mvvm
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
-import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.test.githubapi_mvvm.api.APIManager
-import com.test.githubapi_mvvm.api.repository.GithubRepository
 import com.test.githubapi_mvvm.databinding.ActivityUserdetailBinding
 import com.test.githubapi_mvvm.viewMode.GithubUserInfoFactory
 import com.test.githubapi_mvvm.viewMode.GithubUserInfoViewMode
 import kotlinx.android.synthetic.main.activity_userdetail.*
 
 class UserDetailActivity : AppCompatActivity() {
-    private lateinit var githubUserInfoVM:GithubUserInfoViewMode
+    private lateinit var github_user_info_VM:GithubUserInfoViewMode
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_userdetail)
 
         val login = intent.getStringExtra("login")
 
-        val dataBinding = DataBindingUtil.setContentView<ActivityUserdetailBinding>(this,R.layout.activity_userdetail)
+        val data_binding = DataBindingUtil.setContentView<ActivityUserdetailBinding>(this,R.layout.activity_userdetail)
         val api = APIManager.getAPIManagerInstance()
         val service = api.getService()
-        val repo = GithubRepository(service)
 
-        githubUserInfoVM = ViewModelProvider(this ,GithubUserInfoFactory(repo))
+        github_user_info_VM = ViewModelProvider(this ,GithubUserInfoFactory(service))
             .get(GithubUserInfoViewMode::class.java)
-        dataBinding.userInfo = githubUserInfoVM
-        dataBinding.lifecycleOwner = this
+        data_binding.userInfo = github_user_info_VM
+        data_binding.lifecycleOwner = this
 
-        githubUserInfoVM.getUserInfo(login)
+        github_user_info_VM.getUserInfo(login)
 
         //toolbar
         setSupportActionBar(toolbar)

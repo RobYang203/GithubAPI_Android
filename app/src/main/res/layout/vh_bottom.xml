@@ -8,14 +8,14 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/txtNoData"
+        android:id="@+id/txt_no_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="This is end"
         android:gravity="center" />
 
     <ProgressBar
-        android:id="@+id/loadingBar"
+        android:id="@+id/loading_bar"
         android:indeterminate="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

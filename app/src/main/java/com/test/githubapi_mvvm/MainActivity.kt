@@ -1,29 +1,23 @@
 package com.test.githubapi_mvvm
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.test.githubapi_mvvm.api.APIManager
-import com.test.githubapi_mvvm.api.repository.GithubRepository
-import com.test.githubapi_mvvm.api.repository.IGithubRepository
-import com.test.githubapi_mvvm.mode.GithubUserInfoMode
 import com.test.githubapi_mvvm.mode.GithubUserMode
 import com.test.githubapi_mvvm.viewMode.GithubListAdapter
 import com.test.githubapi_mvvm.viewMode.itemEvent
 import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity() {
-    lateinit var repo:GithubRepository
     val TOTAL_PAGES =5;
     val PREPAGE = 20;
-    var nowPage = 1;
+    var now_page = 0;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,39 +28,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setInitData(){
-        val apiMg = APIManager.getAPIManagerInstance()
-        val service = apiMg.getService()
-        val since = nowPage * PREPAGE - PREPAGE
-        repo = GithubRepository(service)
-        repo.getAllUserList(since , PREPAGE ,object :IGithubRepository.ResponseCallBack{
-            override fun onResult(result: List<GithubUserMode>?) {
-                if(!checkView(result == null))
-                    return
+        val api = APIManager.getAPIManagerInstance()
+        val service = api.getService()
+        val since = now_page * PREPAGE - PREPAGE
 
 
-                val lm = LinearLayoutManager(baseContext)
-                lm.orientation = LinearLayoutManager.VERTICAL
+        val lm = LinearLayoutManager(baseContext)
+        lm.orientation = LinearLayoutManager.VERTICAL
 
-                vw_UserList.layoutManager = lm
-                vw_UserList.addItemDecoration(DividerItemDecoration(baseContext , DividerItemDecoration.VERTICAL))
+        vw_user_list.layoutManager = lm
+        vw_user_list.addItemDecoration(DividerItemDecoration(baseContext , DividerItemDecoration.VERTICAL))
 
-                val viewAdapter = GithubListAdapter(baseContext , result as MutableList<GithubUserMode>)
-                viewAdapter.setOnItemClick(object :itemEvent{
-                    override fun onItemClick(data: GithubUserMode) {
-                        val login = data.login
-                        val i = Intent(baseContext , UserDetailActivity::class.java)
-                        i.putExtra("login" , login)
-                        startActivityForResult(i ,1)
-                    }
-                })
-                vw_UserList.adapter = viewAdapter
+        val view_adapter = GithubListAdapter(baseContext ,service)
+        view_adapter.setOnItemClick(object :itemEvent{
+            override fun onItemClick(data: GithubUserMode) {
+                val login = data.login
+                val i = Intent(baseContext , UserDetailActivity::class.java)
+                i.putExtra("login" , login)
+                startActivityForResult(i ,1)
             }
-
         })
+
+
+        vw_user_list.adapter = view_adapter
+        //view_adapter.getUserLisByRx(since,PREPAGE)
     }
 
     private fun setListener(){
-        vw_UserList.addOnScrollListener(object :RecyclerView.OnScrollListener(){
+        vw_user_list.addOnScrollListener(object :RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val manager = recyclerView.layoutManager
@@ -80,36 +69,27 @@ class MainActivity : AppCompatActivity() {
                 }
                 val lastVisibleItemPos = manager.findLastCompletelyVisibleItemPosition()
                 Log.d("list lastVisibleItemPos" , lastVisibleItemPos.toString())
-                if(nowPage + 1 > TOTAL_PAGES){
-                    adapter.isLoading = false
+                if(now_page + 1 > TOTAL_PAGES){
+                    adapter.is_loading = false
                     return
                 }
 
                 if(lastVisibleItemPos >= adapter.itemCount - 1){
-                    adapter.isLoading = true
-                    nowPage++
-                    val since =  nowPage * PREPAGE - PREPAGE
+                    adapter.is_loading = true
+                    now_page++
+                    val since =  now_page * PREPAGE - PREPAGE
+                    adapter.getUserLisByRx(since,PREPAGE)
 
-                    repo.getAllUserList(since , PREPAGE ,object:IGithubRepository.ResponseCallBack{
-                        override fun onResult(result: List<GithubUserMode>?) {
-                            if(!checkView(result == null))
-                                return
-                            adapter.addDataList(result)
-                        }
-                    })
 
                 }
-
-
-
             }
         })
     }
 
     fun checkView(isNoData:Boolean):Boolean{
         if(isNoData){
-            txtNotFound.visibility = View.VISIBLE
-            vw_UserList.visibility = View.GONE
+            txt_not_found.visibility = View.VISIBLE
+            vw_user_list.visibility = View.GONE
             return false
         }
 

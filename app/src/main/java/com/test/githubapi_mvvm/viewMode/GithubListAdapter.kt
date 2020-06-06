@@ -1,24 +1,33 @@
 package com.test.githubapi_mvvm.viewMode
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.test.githubapi_mvvm.R
+import com.test.githubapi_mvvm.api.repository.GithubRepository
+import com.test.githubapi_mvvm.api.services.GithubService
 import com.test.githubapi_mvvm.databinding.VhUseritemBinding
 import com.test.githubapi_mvvm.mode.GithubUserMode
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
+import retrofit2.Response
 
-class GithubListAdapter(context: Context , data:MutableList<GithubUserMode>):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class GithubListAdapter(context: Context , service: GithubService):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val VIEW_BOTTOM = 1
     val VIEW_DATA=0
 
     val context = context
-    val data = data
-    var itemEvent:itemEvent? = null
-    var isLoading:Boolean = true
-    fun setOnItemClick(clickEvent:itemEvent){
-        itemEvent = clickEvent
+    val repo = GithubRepository(service)
+
+    val data:MutableList<GithubUserMode>  = mutableListOf()
+    var item_event:itemEvent? = null
+    var is_loading:Boolean = true
+    fun setOnItemClick(click_event:itemEvent){
+        item_event = click_event
     }
 
     override fun getItemCount(): Int {
@@ -29,22 +38,22 @@ class GithubListAdapter(context: Context , data:MutableList<GithubUserMode>):Rec
         when(getItemViewType(position)){
             VIEW_BOTTOM->{
                 val h =(holder as GithubListBottom)
-                if(isLoading){
-                    h.txtNoData.visibility = View.GONE
+                if(is_loading){
+                    h.txt_no_data.visibility = View.GONE
                     h.progress.visibility = View.VISIBLE
                 }else{
                     h.progress.visibility = View.GONE
-                    h.txtNoData.visibility = View.VISIBLE
+                    h.txt_no_data.visibility = View.VISIBLE
                 }
             }
             VIEW_DATA->{
-                val itemData = data[position]
-                (holder as GithubUserListItem).bind(itemData)
+                val item_data = data[position]
+                (holder as GithubUserListItem).bind(item_data)
                 holder.itemView.setOnClickListener(object :View.OnClickListener{
                     override fun onClick(v: View?) {
-                        if(itemEvent == null)
+                        if(item_event == null)
                             return
-                        itemEvent!!.onItemClick(itemData)
+                        item_event!!.onItemClick(item_data)
                     }
                 })
             }
@@ -73,22 +82,42 @@ class GithubListAdapter(context: Context , data:MutableList<GithubUserMode>):Rec
     }
 
     override fun getItemViewType(position: Int): Int {
-        val isLastItem = position > data.size -1
-        val viewType =
-            if(isLastItem)  VIEW_BOTTOM
+        val is_last_item = position > data.size -1
+        val view_type =
+            if(is_last_item)  VIEW_BOTTOM
             else VIEW_DATA;
-        return viewType
+        return view_type
     }
 
-    fun setNoDataLoading(isLoading:Boolean){
-        this.isLoading = isLoading
+    fun setNoDataLoading(is_loading:Boolean){
+        this.is_loading = is_loading
     }
 
-    fun addDataList(moreList:List<GithubUserMode>?){
-        if(moreList == null)
+    fun addDataList(more_list:List<GithubUserMode>?){
+        if(more_list == null)
             return
-        data.addAll(moreList!!)
+        data.addAll(more_list!!)
 
         notifyDataSetChanged()
+    }
+
+    fun getUserLisByRx(since:Int , page_count:Int) {
+        repo.getAllUserList(since , page_count)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe( object: DisposableSingleObserver<Response<List<GithubUserMode>>?>(){
+
+                override fun onSuccess(response: Response<List<GithubUserMode>>) {
+                    val code = response.code()
+                    if(code != 200)
+                        return
+                    val result = response.body() as List<GithubUserMode>
+                    addDataList(result)
+                }
+
+                override fun onError(e: Throwable) {
+                    Log.e("Get User List error" , e.toString())
+                }
+            })
     }
 }
